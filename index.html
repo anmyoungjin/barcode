@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<!-- 
+  ==========================================================
+  스마트 바코드 쇼핑 웹앱 - 최종본 (3~11단계 완성)
+  파일 역할: 화면의 뼈대(구조)를 담당합니다.
+
+  화면 4개
+   1) screenHome   : 홈
+   2) screenCreate : 바코드 만들기
+   3) screenScan   : 카메라 스캔
+   4) screenResult : 인식 결과 / 쇼핑몰 이동
+  ==========================================================
+-->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- 모바일 필수 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="바코드를 스캔하면 등록된 쇼핑몰 상품 페이지로 이동합니다." />
+
+  <title>스마트 바코드 쇼핑</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ========================================================
+       외부 라이브러리 2개 (인터넷 연결 필요)
+       1) JsBarcode  : 바코드를 그려주는 라이브러리
+       2) ZXing      : 카메라 영상에서 바코드를 읽는 라이브러리
+       defer = HTML을 다 읽은 뒤 실행하라는 뜻입니다.
+  ======================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js" defer></script>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- ==================================================
+         화면 1) 홈
+    ================================================== -->
+    <section class="screen screen--active" id="screenHome">
+
+      <header class="header">
+        <h1 class="header__title">🛍️ 스마트 바코드 쇼핑</h1>
+        <p class="header__subtitle">바코드를 스캔하면 상품 페이지로 이동합니다.</p>
+      </header>
+
+      <main class="main">
+
+        <div class="actions">
+          <button type="button" class="btn btn--primary" id="btnGoScan">
+            <span class="btn__icon">📷</span>
+            <span class="btn__text">
+              <strong>바코드 스캔하기</strong>
+              <small>카메라로 상품 바코드를 읽습니다</small>
+            </span>
+          </button>
+
+          <button type="button" class="btn btn--secondary" id="btnGoCreate">
+            <span class="btn__icon">🏷️</span>
+            <span class="btn__text">
+              <strong>바코드 만들기</strong>
+              <small>상품 정보로 바코드를 생성합니다</small>
+            </span>
+          </button>
+        </div>
+
+        <!-- 등록된 상품 개수 안내 -->
+        <div class="card">
+          <div class="card__head">
+            <h2 class="card__title">등록된 상품</h2>
+            <span class="badge" id="productCount">0개</span>
+          </div>
+          <ul class="product-list" id="productList"></ul>
+        </div>
+
+        <!-- 최근 인식 상품 -->
+        <div class="card">
+          <div class="card__head">
+            <h2 class="card__title">최근 인식 상품</h2>
+            <button type="button" class="link-btn" id="btnClearRecent">기록 지우기</button>
+          </div>
+
+          <div class="empty" id="recentEmpty">
+            <div class="empty__icon">🧾</div>
+            <p class="empty__text">아직 스캔한 상품이 없습니다.</p>
+            <p class="empty__hint">바코드를 스캔하면 여기에 기록됩니다.</p>
+          </div>
+
+          <ul class="recent-list" id="recentList"></ul>
+        </div>
+
+      </main>
+
+      <footer class="footer">
+        <p>등록된 상품만 이동합니다 · HTTPS 주소만 허용</p>
+      </footer>
+    </section>
+
+
+    <!-- ==================================================
+         화면 2) 바코드 만들기
+    ================================================== -->
+    <section class="screen" id="screenCreate">
+
+      <header class="topbar">
+        <button type="button" class="topbar__back" id="btnBackFromCreate" aria-label="홈으로 돌아가기">‹</button>
+        <h2 class="topbar__title">🏷️ 바코드 만들기</h2>
+      </header>
+
+      <main class="main">
+
+        <div class="card">
+          <h3 class="card__title">상품 정보 입력</h3>
+
+          <div class="field">
+            <label class="field__label" for="inputName">상품명</label>
+            <input class="field__input" type="text" id="inputName"
+                   placeholder="예) 아메리카노" autocomplete="off" maxlength="40" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="inputCode">상품코드</label>
+            <input class="field__input" type="text" id="inputCode"
+                   placeholder="예) SHOP001" autocomplete="off"
+                   autocapitalize="characters" maxlength="30" />
+            <p class="field__hint">영문·숫자·하이픈(-)·밑줄(_)만 사용할 수 있습니다.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="inputUrl">쇼핑몰 URL</label>
+            <input class="field__input" type="url" id="inputUrl"
+                   placeholder="예) https://example.com/product/001"
+                   autocomplete="off" inputmode="url" />
+            <p class="field__hint">보안을 위해 허용된 도메인의 https:// 주소만 등록됩니다.</p>
+          </div>
+
+          <!-- 입력 오류 메시지 자리 -->
+          <p class="form-error" id="createError" hidden></p>
+
+          <button type="button" class="btn btn--block btn--primary" id="btnMakeBarcode">
+            바코드 생성
+          </button>
+        </div>
+
+        <!-- 생성 결과 -->
+        <div class="card">
+          <h3 class="card__title">생성된 바코드</h3>
+
+          <div class="barcode-box" id="barcodeBox">
+            <p class="barcode-box__placeholder" id="barcodePlaceholder">
+              아직 생성된 바코드가 없습니다.
+            </p>
+            <!-- JsBarcode가 이 캔버스에 바코드를 그립니다 -->
+            <canvas id="barcodeCanvas" hidden></canvas>
+          </div>
+
+          <!-- 바코드 아래 상품 정보 -->
+          <dl class="info" id="barcodeInfo" hidden>
+            <div class="info__row">
+              <dt>상품명</dt><dd id="infoName">-</dd>
+            </div>
+            <div class="info__row">
+              <dt>상품코드</dt><dd id="infoCode">-</dd>
+            </div>
+            <div class="info__row">
+              <dt>쇼핑몰 주소</dt><dd class="info__url" id="infoUrl">-</dd>
+            </div>
+          </dl>
+
+          <button type="button" class="btn btn--block btn--secondary" id="btnSaveBarcode" hidden>
+            바코드 저장
+          </button>
+          <p class="field__hint" id="saveHint" hidden>
+            저장이 안 되면 바코드 이미지를 길게 눌러 저장해주세요.
+          </p>
+        </div>
+
+      </main>
+    </section>
+
+
+    <!-- ==================================================
+         화면 3) 바코드 스캔
+    ================================================== -->
+    <section class="screen" id="screenScan">
+
+      <header class="topbar">
+        <button type="button" class="topbar__back" id="btnBackFromScan" aria-label="홈으로 돌아가기">‹</button>
+        <h2 class="topbar__title">📷 바코드 스캔하기</h2>
+      </header>
+
+      <main class="main">
+
+        <div class="camera">
+          <!-- 카메라 영상이 나오는 곳 
+               playsinline : 아이폰에서 전체화면으로 튀지 않게 하는 필수 속성 -->
+          <video id="video" playsinline muted autoplay></video>
+
+          <p class="camera__placeholder" id="cameraPlaceholder">카메라를 준비하고 있습니다…</p>
+
+          <div class="camera__guide" id="cameraGuide">
+            <span class="camera__guide-text">바코드를<br />맞춰주세요</span>
+          </div>
+        </div>
+
+        <p class="scan-hint">바코드를 카메라 중앙에 맞춰주세요.</p>
+
+        <div class="card">
+          <p class="scan-status" id="scanStatus">카메라를 켜는 중입니다…</p>
+        </div>
+
+        <!-- 카메라 오류 안내 -->
+        <div class="alert alert--error" id="cameraError" hidden>
+          <p class="alert__title" id="cameraErrorTitle">카메라를 사용할 수 없습니다.</p>
+          <p class="alert__text" id="cameraErrorText"></p>
+          <button type="button" class="btn btn--block btn--primary" id="btnRetryCamera">다시 시도</button>
+        </div>
+
+        <button type="button" class="btn btn--block btn--ghost" id="btnCancelScan">스캔 취소</button>
+
+      </main>
+    </section>
+
+
+    <!-- ==================================================
+         화면 4) 인식 결과
+    ================================================== -->
+    <section class="screen" id="screenResult">
+
+      <header class="topbar">
+        <button type="button" class="topbar__back" id="btnBackFromResult" aria-label="홈으로 돌아가기">‹</button>
+        <h2 class="topbar__title">인식 결과</h2>
+      </header>
+
+      <main class="main">
+
+        <!-- (1) 상품을 찾은 경우 -->
+        <div class="result" id="resultSuccess" hidden>
+          <div class="result__badge">✅</div>
+          <p class="result__headline">상품을 찾았습니다.</p>
+          <p class="result__name" id="resultName">-</p>
+
+          <div class="card">
+            <dl class="info">
+              <div class="info__row"><dt>상품코드</dt><dd id="resultCode">-</dd></div>
+              <div class="info__row"><dt>쇼핑몰</dt><dd class="info__url" id="resultUrl">-</dd></div>
+            </dl>
+          </div>
+
+          <div class="countdown">
+            <p class="countdown__text"><span id="countdownSec">3</span>초 후 쇼핑몰로 이동합니다.</p>
+            <div class="countdown__number" id="countdownNumber">3</div>
+          </div>
+
+          <button type="button" class="btn btn--block btn--primary" id="btnGoNow">지금 쇼핑몰 이동</button>
+          <button type="button" class="btn btn--block btn--ghost" id="btnCancelMove">이동 취소</button>
+        </div>
+
+        <!-- (2) 등록되지 않은 바코드 -->
+        <div class="result" id="resultFail" hidden>
+          <div class="result__badge">⚠️</div>
+          <p class="result__headline">등록되지 않은 상품입니다.</p>
+
+          <div class="card">
+            <dl class="info">
+              <div class="info__row"><dt>인식된 코드</dt><dd id="failCode">-</dd></div>
+            </dl>
+            <p class="field__hint" id="failReason">
+              이 코드는 등록된 상품 목록에 없습니다. 쇼핑몰로 이동하지 않습니다.
+            </p>
+          </div>
+
+          <button type="button" class="btn btn--block btn--primary" id="btnRescan">다시 스캔</button>
+          <button type="button" class="btn btn--block btn--ghost" id="btnGoHomeFromFail">홈으로</button>
+        </div>
+
+      </main>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

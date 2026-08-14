@@ -1,0 +1,605 @@
+/* ==========================================================
+   스마트 바코드 쇼핑 웹앱 - 최종본
+   파일 역할: 화면의 디자인(색, 크기, 배치)을 담당합니다.
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. 공통 색상 / 크기
+   여기 값만 바꾸면 앱 전체 색이 한 번에 바뀝니다.
+---------------------------------------------------------- */
+:root {
+  --color-bg: #f4f5f9;
+  --color-card: #ffffff;
+  --color-text: #1b2033;
+  --color-sub: #6b7280;
+  --color-line: #e6e8ef;
+  --color-primary: #ff5a3c;
+  --color-primary-dark: #e64327;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  --radius: 18px;
+  --shadow: 0 6px 20px rgba(27, 32, 51, 0.07);
+}
+
+/* ----------------------------------------------------------
+   2. 기본 초기화
+---------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+               "Malgun Gothic", "맑은 고딕", "Noto Sans KR", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 16px);
+}
+
+/* ----------------------------------------------------------
+   3. 화면 전환
+---------------------------------------------------------- */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+}
+
+.screen--active {
+  display: flex;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------
+   4. 헤더 / 상단 바
+---------------------------------------------------------- */
+.header {
+  padding: 28px 4px 20px;
+}
+
+.header__title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.header__subtitle {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--color-sub);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0;
+}
+
+.topbar__back {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.topbar__back:active {
+  background-color: rgba(27, 32, 51, 0.06);
+}
+
+.topbar__title {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ----------------------------------------------------------
+   5. 버튼
+---------------------------------------------------------- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 72px;
+  padding: 16px 18px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 17px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.btn--block {
+  justify-content: center;
+  min-height: 56px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.btn__icon {
+  font-size: 30px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.btn__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.btn__text strong { font-size: 18px; font-weight: 700; }
+.btn__text small  { font-size: 13px; opacity: 0.75; }
+
+.btn--primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(255, 90, 60, 0.28);
+}
+
+.btn--primary:active { background-color: var(--color-primary-dark); }
+
+.btn--secondary {
+  background-color: var(--color-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow);
+}
+
+.btn--ghost {
+  background-color: var(--color-card);
+  color: var(--color-sub);
+  border: 1px solid var(--color-line);
+}
+
+/* 글자만 있는 작은 버튼 */
+.link-btn {
+  border: none;
+  background: transparent;
+  color: var(--color-sub);
+  font-family: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* ----------------------------------------------------------
+   6. 카드
+---------------------------------------------------------- */
+.card {
+  background-color: var(--color-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.card__title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* .card__head 안에 없는 단독 제목에도 아래 여백을 줍니다 */
+.card > .card__title {
+  margin-bottom: 14px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background-color: rgba(255, 90, 60, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* ----------------------------------------------------------
+   7. 입력창
+---------------------------------------------------------- */
+.field { margin-bottom: 16px; }
+
+.field__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.field__input {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background-color: #fafbfd;
+  font-family: inherit;
+  font-size: 16px;   /* 아이폰 자동 확대 방지 */
+  color: var(--color-text);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background-color: #ffffff;
+}
+
+.field__input::placeholder { color: #a8adba; }
+
+.field__hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--color-sub);
+}
+
+.form-error {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: #fef2f2;
+  color: var(--color-danger);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------
+   8. 바코드 표시 영역
+---------------------------------------------------------- */
+.barcode-box {
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--color-line);
+  border-radius: 12px;
+  padding: 16px;
+  background-color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.barcode-box__placeholder {
+  font-size: 14px;
+  color: var(--color-sub);
+  text-align: center;
+}
+
+#barcodeCanvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 상품 정보 표 */
+.info {
+  border-top: 1px solid var(--color-line);
+}
+
+.info__row {
+  display: flex;
+  gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 14px;
+}
+
+.info__row dt {
+  flex-shrink: 0;
+  width: 78px;
+  color: var(--color-sub);
+}
+
+.info__row dd {
+  flex: 1;
+  font-weight: 600;
+  word-break: break-all;   /* 긴 URL이 화면 밖으로 나가지 않게 */
+}
+
+.info__url {
+  font-weight: 500 !important;
+  font-size: 13px;
+  color: var(--color-sub);
+}
+
+/* ----------------------------------------------------------
+   9. 카메라 영역
+---------------------------------------------------------- */
+.camera {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: #14161c;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 카메라 영상 */
+#video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* 잘리더라도 영역을 꽉 채웁니다 */
+  background-color: #14161c;
+}
+
+.camera__placeholder {
+  position: relative;
+  z-index: 1;
+  color: #9aa1b1;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.6;
+  padding: 0 20px;
+}
+
+.camera__guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76%;
+  height: 32%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.camera__guide-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* 인식 성공 순간 초록색으로 반짝 */
+.camera__guide--found {
+  border-color: #4ade80;
+}
+
+.scan-hint {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.scan-status {
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-sub);
+}
+
+/* ----------------------------------------------------------
+   10. 오류 안내 박스
+---------------------------------------------------------- */
+.alert {
+  border-radius: var(--radius);
+  padding: 18px;
+  border: 1px solid;
+}
+
+.alert--error {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.alert__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-danger);
+  margin-bottom: 6px;
+}
+
+.alert__text {
+  font-size: 14px;
+  color: #7f1d1d;
+  line-height: 1.6;
+  margin-bottom: 14px;
+  white-space: pre-line;   /* 줄바꿈(\n)을 그대로 표시 */
+}
+
+/* ----------------------------------------------------------
+   11. 인식 결과 화면
+---------------------------------------------------------- */
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+}
+
+.result__badge {
+  font-size: 56px;
+  line-height: 1;
+  margin-top: 10px;
+}
+
+.result__headline {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.result__name {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-primary);
+  word-break: keep-all;
+}
+
+/* 결과 화면 안의 표는 왼쪽 정렬 */
+.result .info__row { text-align: left; }
+
+.countdown {
+  padding: 6px 0;
+}
+
+.countdown__text {
+  font-size: 14px;
+  color: var(--color-sub);
+}
+
+.countdown__number {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.2;
+  animation: pop 1s ease infinite;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1);    opacity: 1; }
+  70%  { transform: scale(0.88); opacity: 0.55; }
+  100% { transform: scale(0.88); opacity: 0.55; }
+}
+
+/* ----------------------------------------------------------
+   12. 목록 (등록 상품 / 최근 인식)
+---------------------------------------------------------- */
+.product-list,
+.recent-list {
+  list-style: none;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.list-item:last-child { border-bottom: none; }
+
+.list-item__main { min-width: 0; text-align: left; }
+
+.list-item__name {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item__sub {
+  font-size: 12px;
+  color: var(--color-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item__code {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-sub);
+  background-color: #f1f2f6;
+  padding: 5px 9px;
+  border-radius: 8px;
+}
+
+/* ----------------------------------------------------------
+   13. 빈 목록 / 푸터
+---------------------------------------------------------- */
+.empty {
+  text-align: center;
+  padding: 22px 8px;
+}
+
+.empty__icon { font-size: 34px; margin-bottom: 8px; }
+.empty__text { font-size: 15px; font-weight: 600; }
+
+.empty__hint {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-sub);
+}
+
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-sub);
+  padding: 20px 0 8px;
+}
+
+/* ----------------------------------------------------------
+   14. 작은 화면 대응 / 접근성
+---------------------------------------------------------- */
+@media (max-width: 360px) {
+  .header__title { font-size: 21px; }
+  .btn__text strong { font-size: 16px; }
+  .result__name { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  .screen--active,
+  .countdown__number {
+    transition: none !important;
+    animation: none !important;
+  }
+}
